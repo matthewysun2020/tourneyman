@@ -6,6 +6,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tournament.db'
 db = SQLAlchemy(app)
 
+app.app_context().push()
+
 class Tournament(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tournament_id = db.Column(db.Integer, nullable=False)
@@ -36,9 +38,12 @@ def new():
 def create():
     data = request.form
     tournament = Tournament(
-        tournament_id=data['tournament_id']
+        tournament_id=data['tournament_id'],
         tFormat=data['format']
     )
+    db.session.add(contestant)
+    db.session.commit()
+    return jsonify({'message': 'Tournament created'}), 201
 
 @app.route('/entry')
 def entry():
@@ -83,6 +88,7 @@ def bracket():
 def display(id):
     # TODO: Display specific bracket of tournament with ID, with proper format.
     # Need to somehow store tournament format with ID, then pass it to the HTML page.
+    return True
 
 if __name__ == '__main__':
     db.create_all()
