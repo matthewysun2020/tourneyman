@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register Contestants</title>
+</head>
+<body>
+    <h1>Register Contestants</h1>
+    <form action="/submit" method="post">
+        Tournament ID: <input type="number" name="tournament_id"><br>
+        Format: <select name="format">
+                    <option value="single">Single Elimination</option>
+                    <option value="double">Double Elimination</option>
+                    <option value="round">Round Robin</option>
+                    <option value="swiss">Swiss format</option>
+                </select><br>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

@@ -8,6 +8,11 @@ db = SQLAlchemy(app)
 
 class Tournament(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    tournament_id = db.Column(db.Integer, nullable=False)
+    tFormat = db.Column(db.String(80), nullable=False)
+
+class Contestant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     player = db.Column(db.String(80), nullable=False)
     seed = db.Column(db.Integer, nullable=True)
     tournament_id = db.Column(db.Integer, nullable=False)
@@ -23,6 +28,18 @@ class MatchResult(db.Model):
 def index():
     return render_template('index.html')
 
+@app.route('/new')
+def new():
+    return render_template('new.html')
+
+@app.route('/new/submit')
+def create():
+    data = request.form
+    tournament = Tournament(
+        tournament_id=data['tournament_id']
+        tFormat=data['format']
+    )
+
 @app.route('/entry')
 def entry():
     return render_template('entry.html')
@@ -30,7 +47,7 @@ def entry():
 @app.route('/entry/submit')
 def register():
     data = request.form
-    contestant = Tournament(
+    contestant = Contestant(
         player=data['player'],
         seed=data['seed'],
         tournament_id=data['tournament_id']
