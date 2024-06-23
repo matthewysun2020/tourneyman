@@ -23,7 +23,27 @@ class MatchResult(db.Model):
 def index():
     return render_template('index.html')
 
-@app.route('/submit', methods=['POST'])
+@app.route('/entry')
+def entry():
+    return render_template('entry.html')
+
+@app.route('/entry/submit')
+def register():
+    data = request.form
+    contestant = Tournament(
+        player=data['player'],
+        seed=data['seed'],
+        tournament_id=data['tournament_id']
+    )
+    db.session.add(contestant)
+    db.session.commit()
+    return jsonify({'message': 'Contestant registered'}), 201
+
+@app.route('/match')
+def match():
+    return render_template('match.html')
+
+@app.route('/match/submit', methods=['POST'])
 def submit_result():
     data = request.form
     match_result = MatchResult(
@@ -38,8 +58,14 @@ def submit_result():
 
 @app.route('/bracket')
 def bracket():
-    results = MatchResult.query.all()
-    return render_template('bracket.html', results=results)
+    # TODO: Needs to be restructured. Return based on tournament ID.
+    # Find each unique tournament ID here, then render new HTML once selection is made
+    return render_template('bracket.html', tournaments=tournaments)
+
+@app.route('/bracket/<id>')
+def display(id):
+    # TODO: Display specific bracket of tournament with ID, with proper format.
+    # Need to somehow store tournament format with ID, then pass it to the HTML page.
 
 if __name__ == '__main__':
     db.create_all()
