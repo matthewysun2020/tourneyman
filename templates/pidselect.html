@@ -1,45 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 50px;
-        }
-
-        .container {
-            text-align: center;
-        }
-
-        button {
-            display: block;
-            margin: 20px;
-            padding: 15px;
-            background-color: #007BFF;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            width: 200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-            button:hover {
-                background-color: #0056b3;
-            }
-    </style>
-    <title>Register Contestants</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Select Tournament</title>
 </head>
 <body>
-    <h1>Register Contestants</h1>
+    <h1>Select Tournament</h1>
     <form action="/players" method="post">
-        Select Tournament: <select name="id">
+        <input id="hidden_field" type="hidden" name="origin" value="players">
+        Tournament ID: <select name="id">
             {% for tournament in tournaments %}
-               <option value='{{ tournament.tournament_id }}'>Tournament {{ tournament.tournament_id }}</option>
+            <option value='{{ tournament.tournament_id }}'>Tournament {{ tournament.tournament_id }}</option>
             {% endfor %}
         </select><br>
         <button type="submit">Submit</button>
     </form>
     <button onclick="window.location='/'">Back to Home</button>
+    <script>
+        document.getElementById("hidden_field").original_url.value = "players";
+    </script>
 </body>
 </html>

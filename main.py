@@ -7,7 +7,14 @@ from threading import Thread
 import socket
 
 def start_flask():
-    subprocess.Popen(['python', 'app.py'])
+    global flask_process   
+    flask_process = subprocess.Popen(['python', 'app.py'])
+
+def stop_flask():
+    global flask_process
+    if flask_process:
+        flask_process.terminate()  # Terminate the Flask subprocess
+        flask_process = None  # Reset the global variable
 
 def get_local_ip():
     # Get the local IP address of the device
@@ -27,6 +34,14 @@ def display_url(url):
     root = tk.Tk()
     root.title("tourneyman")
     root.geometry("800x450")  # Set initial window size
+
+    def _quit():
+        root.quit()
+        root.destroy()
+        stop_flask()
+        print("exited")
+
+    root.protocol("WM_DELETE_WINDOW", _quit)
 
     # Define custom fonts
     title_font = font.Font(family="Bahnschrift SemiBold", size=35, weight="bold")
@@ -57,7 +72,6 @@ def main():
     # Start the Flask server in a separate thread
     flask_thread = Thread(target=start_flask)
     flask_thread.start()
-    print("Flask server started")
 
     # Give Flask some time to start up
     time.sleep(2)

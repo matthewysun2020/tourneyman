@@ -1,34 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <title>Submit Match Result</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 50px;
-        }
-
-        .container {
-            text-align: center;
-        }
-
-        .link {
-            display: block;
-            margin: 20px;
-            padding: 15px;
-            background-color: #007BFF;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            width: 200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-            .link:hover {
-                background-color: #0056b3;
-            }
-    </style>
 </head>
 <body>
     <h1>Submit Match Result</h1>
@@ -39,5 +13,6 @@
         Tournament ID: <input type="number" name="tournament_id"><br>
         <button type="submit">Submit</button>
     </form>
+    <button onclick="window.location='/'">Back to Home</button>
 </body>
 </html>
