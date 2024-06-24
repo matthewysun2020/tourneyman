@@ -25,4 +25,4 @@ The app uses localtunnel and Node.js, as well as the Flask and SQLAlchemy packag
 
 **1. Run the application.** The app will return a URL that you can access that takes you to the homepage for the tournament.
 
-**2. Create a tournament.** Access the given URL from any device. The homepage displays four buttons: Tournament Creation, Registration, Match Submission, and Bracket. Click on Tournament Creation, input an integer ID, and select a format.
+**2. Create a tournament.** Access the given URL from any device. Click the New Tournament button, enter an integer ID, and select a tournament format.

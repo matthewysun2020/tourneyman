@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Register Contestants</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,6 +10,23 @@
         .container {
             text-align: center;
         }
+
+        button {
+            display: block;
+            margin: 20px;
+            padding: 15px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
 
         .link {
             display: block;
@@ -29,18 +45,21 @@
                 background-color: #0056b3;
             }
     </style>
+    <title>Create Tournament</title>
 </head>
 <body>
-    <h1>Register Contestants</h1>
-    <form action="/submit" method="post">
+    <h1>Create Tournament</h1>
+    <form action="/new/submit" method="post">
         Tournament ID: <input type="number" name="tournament_id"><br>
         Format: <select name="format">
-                    <option value="single">Single Elimination</option>
-                    <option value="double">Double Elimination</option>
-                    <option value="round">Round Robin</option>
-                    <option value="swiss">Swiss format</option>
-                </select><br>
+            <option value="single">Single Elimination</option>
+            <option value="double">Double Elimination</option>
+            <option value="round">Round Robin</option>
+            <option value="swiss">Swiss format</option>
+        </select><br>
         <button type="submit">Submit</button>
     </form>
+    <button onclick="window.location='/'">Back to Home</button>
 </body>
 </html>
+

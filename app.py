@@ -34,22 +34,22 @@ def index():
 def new():
     return render_template('new.html')
 
-@app.route('/new/submit')
+@app.route('/new/submit', methods=['POST'])
 def create():
     data = request.form
     tournament = Tournament(
         tournament_id=data['tournament_id'],
         tFormat=data['format']
     )
-    db.session.add(contestant)
+    db.session.add(tournament)
     db.session.commit()
-    return jsonify({'message': 'Tournament created'}), 201
+    return render_template('submission.html')
 
 @app.route('/entry')
 def entry():
     return render_template('entry.html')
 
-@app.route('/entry/submit')
+@app.route('/entry/submit', methods=['POST'])
 def register():
     data = request.form
     contestant = Contestant(
@@ -59,7 +59,7 @@ def register():
     )
     db.session.add(contestant)
     db.session.commit()
-    return jsonify({'message': 'Contestant registered'}), 201
+    return render_template('submission.html')
 
 @app.route('/match')
 def match():
@@ -76,13 +76,13 @@ def submit_result():
     )
     db.session.add(match_result)
     db.session.commit()
-    return jsonify({'message': 'Result recorded'}), 201
+    return render_template('submission.html')
 
 @app.route('/bracket')
 def bracket():
     # TODO: Needs to be restructured. Return based on tournament ID.
     # Find each unique tournament ID here, then render new HTML once selection is made
-    return render_template('bracket.html', tournaments=tournaments)
+    return render_template('bidselect.html', tournaments=Tournament.query.all())
 
 @app.route('/bracket/<id>')
 def display(id):
@@ -90,7 +90,15 @@ def display(id):
     # Need to somehow store tournament format with ID, then pass it to the HTML page.
     return True
 
+@app.route('/players')
+def players():
+    return render_template('pidselect.html', tournaments=Tournament.query.all())
+
+@app.route('/players/<id>')
+def displayer(id):
+    return render_template('players.html', contestants=Contestant.query.filter_by(tournament_id=id))
+
 if __name__ == '__main__':
     db.create_all()
     port = int(os.environ.get("PORT", 5000))
-    app.run(port=port)
+    app.run(host="0.0.0.0", port=port)

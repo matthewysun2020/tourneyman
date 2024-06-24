@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Submit Match Result</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,7 +11,7 @@
             text-align: center;
         }
 
-        .link {
+        button {
             display: block;
             margin: 20px;
             padding: 15px;
@@ -25,19 +24,15 @@
             margin-right: auto;
         }
 
-            .link:hover {
+            button:hover {
                 background-color: #0056b3;
             }
     </style>
+    <title>Submission Complete</title>
 </head>
 <body>
-    <h1>Submit Match Result</h1>
-    <form action="/match/submit" method="post">
-        Player 1: <input type="text" name="player1"><br>
-        Player 2: <input type="text" name="player2"><br>
-        Result: <input type="text" name="result"><br>
-        Tournament ID: <input type="number" name="tournament_id"><br>
-        <button type="submit">Submit</button>
-    </form>
+    <h1>Submission Complete</h1>
+    <button onclick="history.back()">Go Back</button>
 </body>
 </html>
+
