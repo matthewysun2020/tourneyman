@@ -8,6 +8,10 @@ There are many apps that allow for the creation of tournament brackets, but this
 
 The app is designed to be intuitive, as easy as possible to pick up and use for anyone, regardless of technical expertise or prowess.
 
+## What's being worked on?
+
+The bracket viewer still needs to be implemented. (Yes, I know this is probably the most important/valuable part of the application. I'm working on it!)
+
 ## Planned features
 
 - Multiple tournament formats (single elimination, double elimination, round robin, Swiss, etc.)
