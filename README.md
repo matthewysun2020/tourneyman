@@ -1,6 +1,6 @@
 # tourneyman
 
-An app designed to allow for easier hosting of small tournaments - built for ease of use.
+An app designed to allow for easier hosting of small tournaments - built for your ease of use.
 
 ## Why tourneyman?
 

@@ -102,9 +102,7 @@ def bracket():
 
 @app.route('/bracket/<id>')
 def display(id):
-    # TODO: Display specific bracket of tournament with ID, with proper format.
-    # Need to somehow store tournament format with ID, then pass it to the HTML page.
-    return True
+    return render_template('bracket.html', tournament_id=id)
 
 @app.route('/players', methods=['GET', 'POST'])
 def players():
