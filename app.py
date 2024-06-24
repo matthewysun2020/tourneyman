@@ -80,8 +80,6 @@ def submit_result():
 
 @app.route('/bracket')
 def bracket():
-    # TODO: Needs to be restructured. Return based on tournament ID.
-    # Find each unique tournament ID here, then render new HTML once selection is made
     return render_template('bidselect.html', tournaments=Tournament.query.all())
 
 @app.route('/bracket/<id>')
@@ -94,11 +92,12 @@ def display(id):
 def players():
     return render_template('pidselect.html', tournaments=Tournament.query.all())
 
-@app.route('/players/<id>')
+@app.route('/players/<id>', methods=['POST'])
 def displayer(id):
     return render_template('players.html', contestants=Contestant.query.filter_by(tournament_id=id))
 
 if __name__ == '__main__':
+    db.drop_all()
     db.create_all()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tournament Bracket</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,7 +11,7 @@
             text-align: center;
         }
 
-        .link {
+        button {
             display: block;
             margin: 20px;
             padding: 15px;
@@ -25,13 +24,22 @@
             margin-right: auto;
         }
 
-            .link:hover {
+            button:hover {
                 background-color: #0056b3;
             }
     </style>
+    <title>Register Contestants</title>
 </head>
 <body>
-    <h1>Tournament Bracket</h1>
-    
+    <h1>Register Contestants</h1>
+    <form action="/players" method="post">
+        Select Tournament: <select name="id">
+            {% for tournament in tournaments %}
+            <option value='{{ tournament.tournament_id }}'>Tournament {{ tournament.tournament_id }}</option>
+            {% endfor %}
+        </select><br>
+        <button type="submit">Submit</button>
+    </form>
+    <button onclick="window.location='/'">Back to Home</button>
 </body>
 </html>

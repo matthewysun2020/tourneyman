@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        button {
+            display: block;
+            margin: 20px;
+            padding: 15px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+    </style>
+    <title>Register Contestants</title>
+</head>
+<body>
+    <h1>Register Contestants</h1>
+    <ul>
+        {% for contestant in contestants %}
+        <li>{{ contestant.player }}</li>
+        {% endfor %}
+    </ul>
+    <button onclick="window.location='/'">Back to Home</button>
+    <button onclick="window.location='/players'">Back to Tournament Select</button>
+</body>
+</html>

@@ -19,7 +19,7 @@ The app is designed to be intuitive, as easy as possible to pick up and use for 
 
 ## How does this work? (WIP)
 
-The app uses localtunnel and Node.js, as well as the Flask and SQLAlchemy packages to host a server containing all your tournament information (players, match results). The app will take care of installing any missing dependencies on your local machine, and you'll only need to run the app to get started.
+The app uses the Flask and SQLAlchemy packages to host a server containing all your tournament information (players, match results). The app will take care of installing any missing dependencies on your local machine, and you'll only need to run the app to get started.
 
 ## How do I use the app? (WIP)
 
