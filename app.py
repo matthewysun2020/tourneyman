@@ -56,7 +56,8 @@ def create():
 
 @app.route('/entry')
 def entry():
-    return render_template('entry.html')
+    tournaments = Tournament.query.all()
+    return render_template('entry.html', tournaments=tournaments)
 
 @app.route('/entry/submit', methods=['POST'])
 def register():
@@ -77,7 +78,8 @@ def register():
 
 @app.route('/match')
 def match():
-    return render_template('match.html')
+    tournaments = Tournament.query.all()
+    return render_template('match.html', tournaments=tournaments)
 
 @app.route('/match/submit', methods=['POST'])
 def submit_result():

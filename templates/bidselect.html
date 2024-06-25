@@ -7,7 +7,8 @@
 
 <body>
     <h1>Register Contestants</h1>
-    <form action="/players" method="post">
+    <form action="/bracket" method="post">
+        <input id="hidden_field" type="hidden" name="origin" value="bracket">
         Select Tournament: <select name="id">
             {% for tournament in tournaments %}
             <option value='{{ tournament.tournament_id }}'>Tournament {{ tournament.tournament_id }}</option>
@@ -16,5 +17,8 @@
         <button type="submit">Submit</button>
     </form>
     <button onclick="window.location='/'">Back to Home</button>
+    <script>
+        document.getElementById("hidden_field").original_url.value = "bracket";
+    </script>
 </body>
 </html>
