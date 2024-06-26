@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, request
+from flask import Flask, request, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import os
 
@@ -62,7 +62,7 @@ def entry():
 @app.route('/entry/submit', methods=['POST'])
 def register():
     data = request.form
-    tournament_id = int(data['tournament_id'])
+    tournament_id = int(data['id'])
     existing_contestant = Contestant.query.filter_by(tournament_id=tournament_id, player=data['player']).first()
     if existing_contestant:
         return redirect(url_for('duplicate'))
@@ -88,7 +88,7 @@ def submit_result():
         player1=data['player1'],
         player2=data['player2'],
         result=data['result'],
-        tournament_id=data['tournament_id']
+        tournament_id=data['id']
     )
     db.session.add(match_result)
     db.session.commit()
