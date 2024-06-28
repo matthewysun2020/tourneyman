@@ -10,7 +10,7 @@
     <form action="/entry/submit" method="post">
         Player Name: <input type="text" name="player"><br>
         Seed (Optional): <input type="number" name="seed"><br>
-        Tournament ID: <select name="id">
+        Tournament ID: <select name="tournament_id">
             {% for tournament in tournaments %}
             <option value='{{ tournament.tournament_id }}'>Tournament {{ tournament.tournament_id }}</option>
             {% endfor %}

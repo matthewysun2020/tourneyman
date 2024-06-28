@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
 
@@ -27,7 +27,7 @@ class MatchResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player1 = db.Column(db.String(80), nullable=False)
     player2 = db.Column(db.String(80), nullable=False)
-    result = db.Column(db.String(80), nullable=False)
+    winner = db.Column(db.String(80), nullable=False)
     tournament_id = db.Column(db.Integer, nullable=False)
 
 @app.route('/')
@@ -62,7 +62,7 @@ def entry():
 @app.route('/entry/submit', methods=['POST'])
 def register():
     data = request.form
-    tournament_id = int(data['id'])
+    tournament_id = int(data['tournament_id'])
     existing_contestant = Contestant.query.filter_by(tournament_id=tournament_id, player=data['player']).first()
     if existing_contestant:
         return redirect(url_for('duplicate'))
@@ -87,14 +87,14 @@ def submit_result():
     match_result = MatchResult(
         player1=data['player1'],
         player2=data['player2'],
-        result=data['result'],
-        tournament_id=data['id']
+        winner=data['winner'],
+        tournament_id=data['tournament_id']
     )
     db.session.add(match_result)
     db.session.commit()
     return render_template('submission.html')
 
-@app.route('/bracket', methods=['Get', 'POST'])
+@app.route('/bracket', methods=['GET', 'POST'])
 def bracket():
     if request.method == 'POST':
         tournament_id = request.form['id']
@@ -121,6 +121,12 @@ def displayer(id):
 @app.route('/duplicate')
 def duplicate():
     return render_template('duplicate.html')
+
+@app.route('/get_players/<tournament_id>', methods=['GET'])
+def get_players(tournament_id):
+    players = Contestant.query.filter_by(tournament_id=tournament_id).all()
+    player_names = [player.player for player in players]
+    return jsonify({'players': player_names})
 
 if __name__ == '__main__':
     db.drop_all()
