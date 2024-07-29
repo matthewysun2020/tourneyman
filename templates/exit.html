@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Player List</title>
+</head>
+
+<body>
+    <h1>Player List for Tournament {{ id }}</h1>
+    <ul>
+        {% for contestant in contestants %}
+        <li>{{ contestant.player }}</li>
+        {% endfor %}
+    </ul>
+    <form action="/exit/{{ id }}/submit" method="post">
+        Player: <select name="player">
+            <option value='{{ contestant.player }}'>
+                {{ contestant.player }}
+            </option>
+        </select><br>
+        <button type="submit">Submit</button>
+    </form>
+    <button onclick="window.location='/exit'">Back to Tournament Select</button>
+    <button onclick="window.location='/'">Back to Home</button>
+</body>
+</html>

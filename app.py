@@ -76,6 +76,24 @@ def register():
     db.session.commit()
     return render_template('submission.html')
 
+@app.route('/exit', methods=['GET', 'POST'])
+def exit():
+    if request.method == 'POST':
+        tournament_id = request.form['id']
+        return redirect(url_for('display', id=tournament_id))
+    tournaments = Tournament.query.all()
+    return render_template('bidselect.html', tournaments=tournaments)
+
+@app.route('/exit/<id>'):
+    return render_template('players.html', contestants=Contestant.query.filter_by(tournament_id=id), id=id)
+
+@app.route('/exit/<id>/submit', methods=['POST'])
+def submit_exit():
+    data = request.form
+    player = Contestant.query.filter_by(tournament_id=id, player=player).delete()
+    db.session.commit()
+    return render_template('submission.html')
+
 @app.route('/match')
 def match():
     tournaments = Tournament.query.all()
