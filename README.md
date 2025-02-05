@@ -27,10 +27,11 @@ The app uses the Flask and SQLAlchemy packages to host a server containing all y
 
 ## How do I use the app? (WIP)
 
-**1. Run the application.** The app will return a URL that you can access that takes you to the homepage for the tournament manager.
+**1. Run the application.** The app will return a URL that you can access that takes you to the homepage for the tournament manager. NOTE: Currently, the proper way to launch this application is to navigate to its directory in a CLI and run `python main.py`.
 
 **2. Create a new tournament.** Click the New Tournament button, enter an integer ID, and select a tournament format.
 
 **3. Add players to the tournament.** Click the Add Players button and add your players! Note that duplicate player names are not allowed. FUTURE FEATURE: Add players that you've added to other tournaments.
 
 From here, you can click the Match Management button and register the results of a match or give a player a bye or update different aspects of the tournament. Once it detects that there's only one player left, it will automatically mark the tournament as complete.
+The application, while it runs, is accessible from any device on the same network as the host. Just access the same URL from the browser. (The app is currently configured to run on 192.168.x.x:5000, where the x's are replaced with the host's local IP.)
