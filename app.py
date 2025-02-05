@@ -394,6 +394,8 @@ def tournaments():
             if new_status != tournament.status:
                 tournament.status = new_status
     
+    tournaments = sorted(tournaments, key=lambda x: (x.status != 'ACTIVE', x.status != 'PENDING', x.start_date), reverse=True)
+    
     db.session.commit()
     return render_template('tournaments.html', tournaments=tournaments)
 
