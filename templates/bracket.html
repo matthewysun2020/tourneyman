@@ -1,31 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-    <title>Bracket</title>
-</head>
+{% extends "base.html" %}
 
-<body>
-    <h1>Bracket for Tournament {{ id }}</h1>
-    <p>Placeholder for bracket page. Coming soon!</p>
-    <button onclick="window.location='/players'">Back to Tournament Select</button>
-    <button onclick="window.location='/'">Back to Home</button>
-    <script>
-        function single_elim() {
+{% block title %}Tournament Bracket - {{ tournament.name }}{% endblock %}
 
-        }
-        function double_elim() {
-
-        }
-        function round_robin() {
-            // pull and display leaderboard
-        }
-        function dutch_swiss() {
-            // if seeded
-        }
-        function monrad_swiss() {
-            // if not seeded
-        }
-    </script>
-</body>
-</html>
+{% block content %}
+<div class="container">
+    <h1>Tournament Bracket - {{ tournament.name }}</h1>
+    <div class="bracket-section">
+        <div id="bracket">
+            <!-- Bracket will be rendered here -->
+            <p>Bracket view coming soon...</p>
+        </div>
+    </div>
+    <div class="navigation">
+        <a href="{{ url_for('tournament_details', tournament_id=tournament.tournament_id) }}" class="link">Back to Tournament</a>
+        <a href="{{ url_for('index') }}" class="link">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

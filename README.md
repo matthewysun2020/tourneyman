@@ -27,6 +27,6 @@ The app uses the Flask and SQLAlchemy packages to host a server containing all y
 
 ## How do I use the app? (WIP)
 
-**1. Run the application.** The app will return a URL that you can access that takes you to the homepage for the tournament.
+**1. Run the application.** The app will return a URL that you can access that takes you to the homepage for the tournament manager.
 
-**2. Create a tournament.** Access the given URL from any device. Click the New Tournament button, enter an integer ID, and select a tournament format.
+**2. Create a new tournament.** Click the New Tournament button, enter an integer ID, and select a tournament format.

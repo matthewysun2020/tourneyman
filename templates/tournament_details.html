@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tournament.name }} - Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ tournament.name }}</h1>
+    
+    <div class="tournament-info">
+        <p><strong>Format:</strong> {{ tournament.tFormat }}</p>
+        <p><strong>Status:</strong> {{ tournament.status }}</p>
+        {% if tournament.is_elimination_format %}
+            <p><strong>Winners Bracket Round:</strong> {{ tournament.current_winners_round }}</p>
+            {% if tournament.is_double_elimination %}
+            <p><strong>Losers Bracket Round:</strong> {{ tournament.current_losers_round }}</p>
+            {% endif %}
+        {% else %}
+            <p><strong>Current Round:</strong> {{ tournament.current_round }}</p>
+            {% if tournament.total_rounds_needed %}
+            <p><strong>Total Rounds:</strong> {{ tournament.total_rounds_needed }}</p>
+            {% endif %}
+        {% endif %}
+        <p><strong>Start Date:</strong> {{ tournament.start_date.strftime('%Y-%m-%d %H:%M') }}</p>
+        {% if tournament.end_date %}
+        <p><strong>End Date:</strong> {{ tournament.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+        {% endif %}
+    </div>
+
+    <div class="player-list">
+        <h2>Players</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Score</th>
+                    <th>Matches Played</th>
+                    <th>Matches Won</th>
+                    {% if not tournament.is_elimination_format %}
+                    <th>Draws</th>
+                    {% endif %}
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in tournament.contestants|sort(attribute='player') %}
+                <tr {% if not player.active %}class="eliminated"{% endif %}>
+                    <td>{{ player.player }}</td>
+                    <td>{{ player.score }}</td>
+                    <td>{{ player.matches_played }}</td>
+                    <td>{{ player.matches_won }}</td>
+                    {% if not tournament.is_elimination_format %}
+                    <td>{{ player.matches_drawn }}</td>
+                    {% endif %}
+                    <td>
+                        {% if player.active %}
+                            {% if tournament.is_elimination_format %}
+                                {{ player.status }}
+                            {% else %}
+                                Active
+                            {% endif %}
+                        {% else %}
+                            Eliminated
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="management-section">
+        <h2>Tournament Management</h2>
+        <div class="management-links">
+            <a href="{{ url_for('add_player_page', tournament_id=tournament.tournament_id) }}" class="button">Add Player</a>
+            <a href="{{ url_for('player_list', tournament_id=tournament.tournament_id) }}" class="button">Player List</a>
+            <a href="{{ url_for('match_management', tournament_id=tournament.tournament_id) }}" class="button">Match Management</a>
+            <a href="{{ url_for('recent_matches', tournament_id=tournament.tournament_id) }}" class="button">Recent Matches</a>
+            <a href="{{ url_for('update_tournament_page', tournament_id=tournament.tournament_id) }}" class="button">Update Tournament</a>
+            <a href="{{ url_for('bracket', tournament_id=tournament.tournament_id) }}" class="button">View Bracket</a>
+        </div>
+    </div>
+
+    <div class="recent-matches">
+        <h2>Recent Matches</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Round</th>
+                    {% if tournament.is_elimination_format %}
+                    <th>Bracket</th>
+                    {% endif %}
+                    <th>Player 1</th>
+                    <th>Player 2</th>
+                    <th>Score</th>
+                    <th>Winner</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in tournament.matches|sort(attribute='completion_time', reverse=True) %}
+                <tr>
+                    <td>{{ match.round_number }}</td>
+                    {% if tournament.is_elimination_format %}
+                    <td>{{ match.bracket }}</td>
+                    {% endif %}
+                    <td>{{ match.player1 }}</td>
+                    <td>{{ match.player2 if match.player2 else 'BYE' }}</td>
+                    <td>{{ match.score if match.score else '-' }}</td>
+                    <td>
+                        {% if match.is_draw %}
+                            Draw
+                        {% else %}
+                            {{ match.winner if match.winner else '-' }}
+                        {% endif %}
+                    </td>
+                    <td>{{ match.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('tournaments') }}" class="link">Back to Tournaments</a>
+        <a href="{{ url_for('index') }}" class="button">Back To Home</a>
+    </div>
+</div>
+
+<style>
+.eliminated {
+    color: #999;
+    text-decoration: line-through;
+}
+
+.tournament-info {
+    margin-bottom: 2em;
+}
+
+.player-list, .recent-matches {
+    margin-bottom: 2em;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f5f5f5;
+}
+
+.actions {
+    margin-top: 2em;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Tournament Manager{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/tourneyman - small.svg') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="navbar-left">
+                <a href="{{ url_for('tournaments') }}" class="navbar-brand">
+                    <img src="{{ url_for('static', filename='img/tourneyman - large.svg') }}" 
+                         alt="Tourneyman" 
+                         class="logo-image"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <span class="logo-text" style="display: none;">⚔️ Tourneyman</span>
+                </a>
+            </div>
+            <div class="navbar-right">
+                <a href="{{ url_for('index') }}" class="nav-button">HOME</a>
+                <a href="{{ url_for('tournaments') }}" class="nav-button">TOURNAMENTS</a>
+            </div>
+        </div>
+    </nav>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

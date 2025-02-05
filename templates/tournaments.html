@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Tournament List{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Tournaments</h1>
+    <div class="tournament-list">
+        {% for tournament in tournaments %}
+        <div class="tournament-card">
+            <h2>{{ tournament.name }}</h2>
+            <p><strong>ID:</strong> {{ tournament.tournament_id }}</p>
+            <p><strong>Format:</strong> {{ tournament.tFormat }}</p>
+            <p><strong>Status:</strong> <span class="status-{{ tournament.status.lower() }}">{{ tournament.status }}</span></p>
+            <p><strong>Start Date:</strong> {{ tournament.start_date.strftime('%Y-%m-%d %H:%M') }}</p>
+            <p><strong>End Date:</strong> {{ tournament.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+            <p><strong>Current Round:</strong> {{ tournament.current_round }}</p>
+            <a href="{{ url_for('tournament_details', tournament_id=tournament.tournament_id) }}" class="button">View Details</a>
+        </div>
+        {% else %}
+        <p>No tournaments found.</p>
+        {% endfor %}
+    </div>
+    <div class="navigation">
+        <a href="{{ url_for('new') }}" class="button">Create New Tournament</a>
+        <a href="{{ url_for('index') }}" class="link">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

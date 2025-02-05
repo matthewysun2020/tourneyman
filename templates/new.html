@@ -1,24 +1,43 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/selectize@0.12.6/dist/css/selectize.default.css">
-    <title>Create Tournament</title>
-</head>
+{% extends "base.html" %}
 
-<body>
-    <h1>Create Tournament</h1>
-    <form action="/new/submit" method="post">
-        Tournament ID: <input type="number" name="tournament_id"><br>
-        Format: <select name="format">
-            <option value="single">Single Elimination</option>
-            <option value="double">Double Elimination</option>
-            <option value="round">Round Robin</option>
-            <option value="swiss">Swiss format</option>
-        </select><br>
-        <button type="submit">Submit</button>
-    </form>
-    <button onclick="window.location='/'">Back to Home</button>
-</body>
-</html>
+{% block title %}Create New Tournament{% endblock %}
 
+{% block content %}
+<div class="container">
+    <h1>Create New Tournament</h1>
+    <div class="form-section">
+        <form action="{{ url_for('create') }}" method="POST">
+            <div class="form-group">
+                <label for="name">Tournament Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="format">Tournament Format:</label>
+                <select id="format" name="format" required>
+                    <option value="single_elimination">Single Elimination</option>
+                    <option value="double_elimination">Double Elimination</option>
+                    <option value="round_robin">Round Robin</option>
+                    <option value="swiss">Swiss</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="start_date">Start Date:</label>
+                <input type="datetime-local" id="start_date" name="start_date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="end_date">End Date:</label>
+                <input type="datetime-local" id="end_date" name="end_date" required>
+            </div>
+
+            <button type="submit" class="button">Create Tournament</button>
+        </form>
+    </div>
+    <div class="navigation">
+        <a href="{{ url_for('tournaments') }}" class="link">Back to Tournaments</a>
+        <a href="{{ url_for('index') }}" class="link">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

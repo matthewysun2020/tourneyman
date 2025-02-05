@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Update Tournament - {{ tournament.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Update Tournament Settings</h1>
+    <div class="form-section">
+        <form action="{{ url_for('update_tournament', tournament_id=tournament.tournament_id) }}" method="POST">
+            <div class="form-group">
+                <label for="name">Tournament Name:</label>
+                <input type="text" id="name" name="name" value="{{ tournament.name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="format">Tournament Format:</label>
+                <select id="format" name="format">
+                    <option value="single_elimination" {% if tournament.tFormat == 'single_elimination' %}selected{% endif %}>Single Elimination</option>
+                    <option value="double_elimination" {% if tournament.tFormat == 'double_elimination' %}selected{% endif %}>Double Elimination</option>
+                    <option value="round_robin" {% if tournament.tFormat == 'round_robin' %}selected{% endif %}>Round Robin</option>
+                    <option value="swiss" {% if tournament.tFormat == 'swiss' %}selected{% endif %}>Swiss</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="start_date">Start Date:</label>
+                <input type="datetime-local" id="start_date" name="start_date" value="{{ tournament.start_date.strftime('%Y-%m-%dT%H:%M') }}">
+            </div>
+            <div class="form-group">
+                <label for="end_date">End Date:</label>
+                <input type="datetime-local" id="end_date" name="end_date" value="{{ tournament.end_date.strftime('%Y-%m-%dT%H:%M') }}">
+            </div>
+            <div class="form-group">
+                <label for="current_round">Current Round:</label>
+                <input type="number" id="current_round" name="current_round" value="{{ tournament.current_round }}" min="1">
+            </div>
+            <button type="submit" class="button">Update Tournament</button>
+        </form>
+    </div>
+    <div class="navigation">
+        <a href="{{ url_for('tournament_details', tournament_id=tournament.tournament_id) }}" class="link">Back to Tournament</a>
+        <a href="{{ url_for('index') }}" class="link">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

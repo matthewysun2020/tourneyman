@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Recent Matches - {{ tournament.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Recent Matches - {{ tournament.name }}</h1>
+    <div class="match-list">
+        {% if matches %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Match</th>
+                    <th>Winner</th>
+                    <th>Loser</th>
+                    <th>Score</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in matches %}
+                <tr>
+                    <td>{{ match.player1 }} vs {{ match.player2 }}</td>
+                    <td>{{ match.winner }}</td>
+                    <td>{{ match.loser }}</td>
+                    <td>{{ match.score }}</td>
+                    <td>{{ match.completion_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No matches recorded yet.</p>
+        {% endif %}
+    </div>
+    <div class="navigation">
+        <a href="{{ url_for('match_management', tournament_id=tournament.tournament_id) }}" class="button">Submit New Match</a>
+        <a href="{{ url_for('tournament_details', tournament_id=tournament.tournament_id) }}" class="link">Back to Tournament</a>
+        <a href="{{ url_for('index') }}" class="link">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Player List - {{ tournament.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Players in {{ tournament.name }}</h1>
+    <div class="player-list">
+        {% for player in players %}
+        <div class="player-card">
+            <div class="player-info">
+                <h3>{{ player.player }}</h3>
+                {% if player.seed %}<p>Seed: {{ player.seed }}</p>{% endif %}
+                <p>Matches: {{ player.matches_won }}/{{ player.matches_played }}</p>
+                <p>Score: {{ player.score }}</p>
+            </div>
+            {% if player.active %}
+            <form action="{{ url_for('remove_player', tournament_id=tournament.tournament_id) }}" method="POST">
+                <input type="hidden" name="player" value="{{ player.player }}">
+                <select name="reason" required>
+                    <option value="withdrawal">Withdrawal</option>
+                    <option value="forfeit">No-Show</option>
+                </select>
+                <button type="submit" class="button-small">Remove</button>
+            </form>
+            {% else %}
+            <p class="status-inactive">Inactive</p>
+            {% endif %}
+        </div>
+        {% else %}
+        <p>No players registered yet.</p>
+        {% endfor %}
+    </div>
+    <div class="navigation">
+        <a href="{{ url_for('add_player_page', tournament_id=tournament.tournament_id) }}" class="button">Add New Player</a>
+        <a href="{{ url_for('tournament_details', tournament_id=tournament.tournament_id) }}" class="link">Back to Tournament</a>
+        <a href="{{ url_for('index') }}" class="link">Back to Home</a>
+    </div>
+</div>
+{% endblock %}
