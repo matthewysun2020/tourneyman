@@ -33,4 +33,4 @@ The app uses the Flask and SQLAlchemy packages to host a server containing all y
 
 **3. Add players to the tournament.** Click the Add Players button and add your players! Note that duplicate player names are not allowed. FUTURE FEATURE: Add players that you've added to other tournaments.
 
-From here, you can lick the Match Management button and register the results of a match or give a player a bye or update different aspects of the tournament. Once it detects that there's only one player left, it will automatically mark the tournament as complete.
+From here, you can click the Match Management button and register the results of a match or give a player a bye or update different aspects of the tournament. Once it detects that there's only one player left, it will automatically mark the tournament as complete.
