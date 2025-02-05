@@ -247,6 +247,15 @@ def register_bye(tournament_id, player_name):
         db.session.add(match)
         db.session.commit()
         
+        # Get the tournament by ID
+        tournament = Tournament.query.filter_by(tournament_id=tournament_id).first()
+        
+        # Check active players
+        active_players = [c for c in tournament.contestants if c.active]
+        if len(active_players) == 1:
+            tournament.status = 'COMPLETED'
+            db.session.commit()
+        
         # Check if round is complete
         check_round_completion(tournament_id)
         
@@ -374,15 +383,16 @@ def tournaments():
     
     # Update tournament statuses based on current time
     for tournament in tournaments:
-        if current_time < tournament.start_date:
-            new_status = 'PENDING'
-        elif current_time <= tournament.end_date:
-            new_status = 'ACTIVE'
-        else:
-            new_status = 'COMPLETED'
-            
-        if new_status != tournament.status:
-            tournament.status = new_status
+        if tournament.status != 'COMPLETED':
+            if current_time < tournament.start_date:
+                new_status = 'PENDING'
+            elif current_time <= tournament.end_date:
+                new_status = 'ACTIVE'
+            else:
+                new_status = 'COMPLETED'
+                
+            if new_status != tournament.status:
+                tournament.status = new_status
     
     db.session.commit()
     return render_template('tournaments.html', tournaments=tournaments)
@@ -485,6 +495,15 @@ def remove_player(tournament_id):
         
         # Set player as inactive instead of deleting
         player.active = False
+        
+        # Get the tournament by ID
+        tournament = Tournament.query.filter_by(tournament_id=tournament_id).first()
+        
+        # Check active players
+        active_players = [c for c in tournament.contestants if c.active]
+        if len(active_players) == 1:
+            tournament.status = 'COMPLETED'
+        
         db.session.commit()
         
         return redirect(url_for('tournament_details', tournament_id=tournament_id))
@@ -572,6 +591,15 @@ def submit_result(tournament_id):
         
         db.session.add(match)
         db.session.commit()
+        
+        # Get the tournament by ID
+        tournament = Tournament.query.filter_by(tournament_id=tournament_id).first()
+        
+        # Check active players
+        active_players = [c for c in tournament.contestants if c.active]
+        if len(active_players) == 1:
+            tournament.status = 'COMPLETED'
+            db.session.commit()
         
         # Check if round is complete and increment if needed
         check_round_completion(tournament_id)
@@ -692,14 +720,15 @@ def update_tournament(tournament_id):
         if data.get('current_round'):
             tournament.current_round = int(data['current_round'])
             
-        # Update status based on new dates
-        current_time = datetime.now()
-        if current_time < tournament.start_date:
-            tournament.status = 'PENDING'
-        elif current_time <= tournament.end_date:
-            tournament.status = 'ACTIVE'
-        else:
-            tournament.status = 'COMPLETED'
+        if tournament.status != 'COMPLETED':
+            # Update status based on new dates
+            current_time = datetime.now()
+            if current_time < tournament.start_date:
+                tournament.status = 'PENDING'
+            elif current_time <= tournament.end_date:
+                tournament.status = 'ACTIVE'
+            else:
+                tournament.status = 'COMPLETED'
             
         db.session.commit()
         return redirect(url_for('tournament_details', tournament_id=tournament_id))

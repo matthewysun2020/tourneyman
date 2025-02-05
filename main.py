@@ -56,10 +56,10 @@ def display_url(url):
     text_label = tk.Label(root, text="Welcome to tourneyman!\nAccess your tournament at:", font=text_font)
     text_label.pack(pady=10)
 
-    # Create URL label
-    url_label = tk.Label(root, text=url, font=url_font, fg="blue", cursor="hand2")
-    url_label.pack(pady=10)
-    url_label.bind("<Button-1>", lambda e: webbrowser.open_new(url))
+    # Create URL button
+    url_button = tk.Button(root, text="Open tourneyman", font=url_font, fg="white", bg="#007bff", borderwidth=1, relief="groove", padx=10, pady=5)
+    url_button.pack(pady=10)
+    url_button.bind("<Button-1>", lambda e: webbrowser.open_new(url))
 
     # Create disclaimer label
     disclaimer_label = tk.Label(root, text="Please keep this window open.\n\nThis application is in development.\nPlease report any bugs.", font=disclaimer_font)
