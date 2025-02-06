@@ -8,7 +8,7 @@
     
     <div class="tournament-info">
         <p><strong>Format:</strong> {{ tournament.tFormat }}</p>
-        <p><strong>Status:</strong> {{ tournament.status }}</p>
+        <p><strong>Status:</strong> <span class="status-{{ tournament.status.lower() }}">{{ tournament.status }}</span></p>
         {% if tournament.is_elimination_format %}
             <p><strong>Winners Bracket Round:</strong> {{ tournament.current_winners_round }}</p>
             {% if tournament.is_double_elimination %}
@@ -69,6 +69,7 @@
     </div>
 
     <div class="management-section">
+        {% if tournament.status != 'CANCELED' %}
         <h2>Tournament Management</h2>
         <div class="management-links">
             <a href="{{ url_for('add_player_page', tournament_id=tournament.tournament_id) }}" class="button">Add Player</a>
@@ -78,6 +79,21 @@
             <a href="{{ url_for('update_tournament_page', tournament_id=tournament.tournament_id) }}" class="button">Update Tournament</a>
             <a href="{{ url_for('bracket', tournament_id=tournament.tournament_id) }}" class="button">View Bracket</a>
         </div>
+        <button class="btn btn-danger" onclick="confirmCancellation()" style="margin: 10px; padding: 12px 24px; background-color: #FF2222; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; transition: background-color 0.2s;">Cancel Tournament</button>
+        {% endif %}
+
+        <script>
+        function confirmCancellation() {
+            const confirmation = prompt('Are you sure you want to cancel this tournament? All individual and overall results will be deleted from the database. Type \'Yes\' to continue.');
+            if (confirmation.toLowerCase() === 'yes') {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ url_for('cancel_tournament', tournament_id=tournament.tournament_id) }}';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+        </script>
     </div>
 
     <div class="recent-matches">

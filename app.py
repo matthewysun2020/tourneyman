@@ -7,6 +7,7 @@ import math
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tournament.db'
+app.secret_key = os.urandom(24)  # Generates a random 24-byte key
 db = SQLAlchemy(app)
 
 app.app_context().push()
@@ -27,7 +28,7 @@ class Tournament(db.Model):
     tournament_id = db.Column(db.Integer, nullable=False, unique=True)
     name = db.Column(db.String(100), nullable=False)
     tFormat = db.Column(db.String(80), nullable=False)
-    status = db.Column(db.String(20), nullable=False, default='PENDING')  # PENDING, ACTIVE, COMPLETED
+    status = db.Column(db.String(20), nullable=False, default='PENDING')  # PENDING, ACTIVE, COMPLETED, CANCELED
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=True)
     current_winners_round = db.Column(db.Integer, default=1)
@@ -383,7 +384,7 @@ def tournaments():
     
     # Update tournament statuses based on current time
     for tournament in tournaments:
-        if tournament.status != 'COMPLETED':
+        if tournament.status != 'COMPLETED' and tournament.status != 'CANCELED':
             if current_time < tournament.start_date:
                 new_status = 'PENDING'
             elif current_time <= tournament.end_date:
@@ -394,7 +395,7 @@ def tournaments():
             if new_status != tournament.status:
                 tournament.status = new_status
     
-    tournaments = sorted(tournaments, key=lambda x: (x.status != 'ACTIVE', x.status != 'PENDING', x.start_date), reverse=True)
+    tournaments = sorted(tournaments, key=lambda x: (int(x.status != 'ACTIVE'), int(x.status != 'PENDING'), int(x.status != 'COMPLETED'), -int(round(x.start_date.timestamp()))))
     
     db.session.commit()
     return render_template('tournaments.html', tournaments=tournaments)
@@ -722,7 +723,7 @@ def update_tournament(tournament_id):
         if data.get('current_round'):
             tournament.current_round = int(data['current_round'])
             
-        if tournament.status != 'COMPLETED':
+        if tournament.status != 'COMPLETED' and tournament.status != 'CANCELED':
             # Update status based on new dates
             current_time = datetime.now()
             if current_time < tournament.start_date:
@@ -745,6 +746,25 @@ def register_bye_route(tournament_id):
         return redirect(url_for('tournament_details', tournament_id=tournament_id))
     except Exception as e:
         return render_template('error.html', error=str(e))
+
+@app.route('/tournaments/<int:tournament_id>/cancel', methods=['POST'])
+def cancel_tournament(tournament_id):
+    tournament = Tournament.query.filter_by(tournament_id=tournament_id).first_or_404()
+    
+    # Check for confirmation
+    confirmation = request.form.get('confirmation')
+    if confirmation == 'Yes':
+        # Remove all matches and byes associated with the tournament
+        MatchResult.query.filter_by(tournament_id=tournament_id).delete()
+        
+        # Set tournament status to CANCELED
+        tournament.status = 'CANCELED'
+        db.session.commit()
+        flash('Tournament has been canceled successfully.')
+    else:
+        flash('Cancellation not confirmed. Tournament remains active.')
+    
+    return redirect(url_for('tournament_details', tournament_id=tournament_id))
 
 @app.cli.command('reset_db')
 def reset_db():
