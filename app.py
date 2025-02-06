@@ -333,6 +333,10 @@ def index():
         recent_players=recent_players[:10]  # Show top 10 recent players
     )
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 @app.route('/new')
 def new():
     # Set min datetime to current time
@@ -409,6 +413,26 @@ def tournament_details(tournament_id):
 def add_player_page(tournament_id):
     tournament = Tournament.query.filter_by(tournament_id=tournament_id).first_or_404()
     return render_template('add_player.html', tournament=tournament)
+
+@app.route('/tournaments/<int:tournament_id>/add_players', methods=['GET', 'POST'])
+def add_players(tournament_id):
+    tournament = Tournament.query.filter_by(tournament_id=tournament_id).first_or_404()
+    
+    if request.method == 'POST':
+        # Logic to add players to the tournament
+        player_ids = request.form.getlist('player_ids')
+        for player_id in player_ids:
+            player = Contestant.query.get(player_id)
+            if player:
+                player.tournament_id = tournament_id  # Associate player with tournament
+                db.session.add(player)
+        db.session.commit()
+        flash('Players added successfully.')
+        return redirect(url_for('tournament_details', tournament_id=tournament_id))
+    
+    # Get existing players
+    existing_players = Contestant.query.filter_by(tournament_id=None).all()  # Players not in any tournament
+    return render_template('add_players.html', tournament=tournament, players=existing_players)
 
 @app.route('/tournaments/<int:tournament_id>/players')
 def player_list(tournament_id):
@@ -653,56 +677,6 @@ def player_stats(player_name):
         total_wins=total_wins,
         tournaments_won=tournaments_won,
         win_rate=round(win_rate, 2)
-    )
-
-@app.route('/tournaments/<int:tournament_id>/add_players', methods=['GET', 'POST'])
-def add_players(tournament_id):
-    """Add existing players to a tournament."""
-    tournament = Tournament.query.filter_by(tournament_id=tournament_id).first_or_404()
-    
-    if request.method == 'POST':
-        try:
-            selected_players = request.form.getlist('players')
-            if not selected_players:
-                raise ValueError("No players selected")
-            
-            # Get existing contestants
-            existing_players = {c.player for c in tournament.contestants}
-            
-            # Add new contestants
-            for player in selected_players:
-                if player not in existing_players:
-                    contestant = Contestant(
-                        tournament_id=tournament_id,
-                        player=player,
-                        registration_time=datetime.now(),
-                        active=True,
-                        matches_played=0,
-                        matches_won=0,
-                        matches_drawn=0,
-                        score=0
-                    )
-                    db.session.add(contestant)
-            
-            db.session.commit()
-            flash('Players added successfully!', 'success')
-            return redirect(url_for('tournament_details', tournament_id=tournament_id))
-            
-        except Exception as e:
-            flash(str(e), 'error')
-            return redirect(url_for('add_players', tournament_id=tournament_id))
-    
-    # Get all unique players from past tournaments
-    all_players = db.session.query(Contestant.player).distinct().all()
-    all_players = [p[0] for p in all_players]
-    # Remove players already in tournament
-    existing_players = {c.player for c in tournament.contestants}
-    available_players = sorted([p for p in all_players if p not in existing_players])
-    
-    return render_template(
-        'add_players.html',
-        tournament=tournament,
-        available_players=available_players
     )
 
 @app.route('/tournaments/<int:tournament_id>/update', methods=['POST'])

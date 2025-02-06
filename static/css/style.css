@@ -1,5 +1,8 @@
+* {
+    font-family: 'Bahnschrift', sans-serif;
+}
+
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
     padding-top: 100px;
     background-color: #f5f5f5;
@@ -51,6 +54,7 @@ h3 {
     display: inline-block;
     margin: 10px;
     padding: 12px 24px;
+    font-size: 16px;
     background-color: #007BFF;
     color: white;
     text-decoration: none;
@@ -59,15 +63,26 @@ h3 {
     cursor: pointer;
     transition: background-color 0.2s;
 }
+.button-danger {
+    display: inline-block;
+    margin: 10px;
+    padding: 12px 24px;
+    font-size: 16px;
+    background-color: #FF2222;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.button-danger:hover {
+    background-color: #BB2222;
+}
 
 .button:hover, .link:hover {
     background-color: #0056b3;
-}
-
-.button-small {
-    padding: 6px 12px;
-    font-size: 14px;
-    margin: 5px;
 }
 
 /* Forms */

@@ -10,7 +10,7 @@
     <nav class="navbar">
         <div class="navbar-content">
             <div class="navbar-left">
-                <a href="{{ url_for('tournaments') }}" class="navbar-brand">
+                <a href="{{ url_for('index') }}" class="navbar-brand">
                     <img src="{{ url_for('static', filename='img/tourneyman - large.svg') }}" 
                          alt="Tourneyman" 
                          class="logo-image"
@@ -21,6 +21,7 @@
             <div class="navbar-right">
                 <a href="{{ url_for('index') }}" class="nav-button">HOME</a>
                 <a href="{{ url_for('tournaments') }}" class="nav-button">TOURNAMENTS</a>
+                <a href="{{ url_for('about') }}" class="nav-button">ABOUT</a>
             </div>
         </div>
     </nav>

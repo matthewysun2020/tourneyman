@@ -73,13 +73,16 @@
         <h2>Tournament Management</h2>
         <div class="management-links">
             <a href="{{ url_for('add_player_page', tournament_id=tournament.tournament_id) }}" class="button">Add Player</a>
+            <a href="{{ url_for('add_players', tournament_id=tournament.tournament_id) }}" class="button">Add Existing Players</a>
             <a href="{{ url_for('player_list', tournament_id=tournament.tournament_id) }}" class="button">Player List</a>
             <a href="{{ url_for('match_management', tournament_id=tournament.tournament_id) }}" class="button">Match Management</a>
             <a href="{{ url_for('recent_matches', tournament_id=tournament.tournament_id) }}" class="button">Recent Matches</a>
-            <a href="{{ url_for('update_tournament_page', tournament_id=tournament.tournament_id) }}" class="button">Update Tournament</a>
             <a href="{{ url_for('bracket', tournament_id=tournament.tournament_id) }}" class="button">View Bracket</a>
         </div>
-        <button class="btn btn-danger" onclick="confirmCancellation()" style="margin: 10px; padding: 12px 24px; background-color: #FF2222; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; transition: background-color 0.2s;">Cancel Tournament</button>
+        <div class="management-links">
+            <a href="{{ url_for('update_tournament_page', tournament_id=tournament.tournament_id) }}" class="button">Update Tournament</a>
+            <button class="button-danger" onclick="confirmCancellation()">Cancel Tournament</button>
+        </div>
         {% endif %}
 
         <script>
