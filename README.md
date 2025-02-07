@@ -29,7 +29,7 @@ The app uses the Flask and SQLAlchemy packages to host a server containing all y
 
 **1. Run the application.** The app will return a URL that you can access that takes you to the homepage for the tournament manager. NOTE: Currently, the proper way to launch this application is to navigate to its directory in a CLI and run `python main.py`.
 
-**2. Create a new tournament.** Click the New Tournament button, enter an integer ID, and select a tournament format.
+**2. Create a new tournament.** Click the New Tournament button, enter an name, select a tournament format, and choose start and end dates.
 
 **3. Add players to the tournament.** Click the Add Players button and add your players! Note that duplicate player names are not allowed. FUTURE FEATURE: Add players that you've added to other tournaments.
 
