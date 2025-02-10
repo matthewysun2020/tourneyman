@@ -129,9 +129,6 @@
             <thead>
                 <tr>
                     <th>Round</th>
-                    {% if tournament.is_elimination_format %}
-                    <th>Bracket</th>
-                    {% endif %}
                     <th>Player 1</th>
                     <th>Player 2</th>
                     <th>Score</th>
@@ -143,9 +140,6 @@
                 {% for match in tournament.matches|sort(attribute='completion_time', reverse=True) %}
                 <tr>
                     <td>{{ match.round_number }}</td>
-                    {% if tournament.is_elimination_format %}
-                    <td>{{ match.bracket }}</td>
-                    {% endif %}
                     <td>{{ match.player1 }}</td>
                     <td>{{ match.player2 if match.player2 else 'BYE' }}</td>
                     <td>{{ match.score if match.score else '-' }}</td>

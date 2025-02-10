@@ -152,7 +152,7 @@ h3 {
 }
 
 /* Lists */
-.player-list, .match-list {
+.players-list, .match-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
@@ -359,7 +359,7 @@ h3 {
         padding: 15px;
     }
 
-    .player-list, .match-list {
+    .players-list, .match-list {
         grid-template-columns: 1fr;
     }
 
