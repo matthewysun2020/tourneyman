@@ -9,17 +9,33 @@
     <div class="tournament-info">
         <p><strong>Format:</strong> {{ tournament.tFormat }}</p>
         <p><strong>Status:</strong> <span class="status-{{ tournament.status.lower() }}">{{ tournament.status }}</span></p>
-        {% if tournament.is_elimination_format %}
-            <p><strong>Winners Bracket Round:</strong> {{ tournament.current_winners_round }}</p>
+        <p><strong>Current Round:</strong>
             {% if tournament.is_double_elimination %}
-            <p><strong>Losers Bracket Round:</strong> {{ tournament.current_losers_round }}</p>
+                {% if tournament.current_round % 2 == 1 %}
+                    {% if tournament.active_players|length <= 2 %}
+                        Grand Finals
+                    {% else %}
+                        Winners Round {{ (tournament.current_round + 1) // 2 }}
+                    {% endif %}
+                {% else %}
+                    {% if tournament.active_players|length <= 2 %}
+                        Grand Finals Reset
+                    {% else %}
+                        Losers Round {{ tournament.current_round // 2 }}
+                    {% endif %}
+                {% endif %}
+            {% elif tournament.is_elimination_format %}
+                {% if tournament.active_players|length == 4 %}
+                    Semi-Finals
+                {% elif tournament.active_players|length == 2 %}
+                    Finals
+                {% else %}
+                    {{ tournament.current_round }}
+                {% endif %}
+            {% else %}
+                {{ tournament.current_round }} / {{ tournament.total_rounds_needed }}
             {% endif %}
-        {% else %}
-            <p><strong>Current Round:</strong> {{ tournament.current_round }}</p>
-            {% if tournament.total_rounds_needed %}
-            <p><strong>Total Rounds:</strong> {{ tournament.total_rounds_needed }}</p>
-            {% endif %}
-        {% endif %}
+        </p>
         <p><strong>Start Date:</strong> {{ tournament.start_date.strftime('%Y-%m-%d %H:%M') }}</p>
         {% if tournament.end_date %}
         <p><strong>End Date:</strong> {{ tournament.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
@@ -88,10 +104,18 @@
         <script>
         function confirmCancellation() {
             const confirmation = prompt('Are you sure you want to cancel this tournament? All individual and overall results will be deleted from the database. Type \'Yes\' to continue.');
-            if (confirmation.toLowerCase() === 'yes') {
+            if (confirmation && confirmation.toLowerCase() === 'yes') {
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '{{ url_for('cancel_tournament', tournament_id=tournament.tournament_id) }}';
+
+                // Create a hidden input field for confirmation
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'confirmation';
+                input.value = 'yes'; // Set the value to 'yes'
+
+                form.appendChild(input);
                 document.body.appendChild(form);
                 form.submit();
             }

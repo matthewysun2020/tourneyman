@@ -60,8 +60,9 @@
                     <option value="">Select Player 1</option>
                     {% for player in active_players|sort(attribute='player') %}
                         {% if tournament.is_elimination_format %}
-                            {% if (bracket == 'winners' and (player.status is none or player.status == 'winners_bracket')) or
-                                  (bracket == 'losers' and player.status == 'losers_bracket') %}
+                            {% if (bracket == 'winners' and (player.status is none or player.status == 'Winners Bracket')) or
+                                  (bracket == 'losers' and player.status == 'Losers Bracket') or
+                                  (active_players|length == 2) %}
                             <option value="{{ player.player }}">{{ player.player }}</option>
                             {% endif %}
                         {% else %}
@@ -77,8 +78,9 @@
                     <option value="">Select Player 2</option>
                     {% for player in active_players|sort(attribute='player') %}
                         {% if tournament.is_elimination_format %}
-                            {% if (bracket == 'winners' and (player.status is none or player.status == 'winners_bracket')) or
-                                  (bracket == 'losers' and player.status == 'losers_bracket') %}
+                            {% if (bracket == 'winners' and (player.status is none or player.status == 'Winners Bracket')) or
+                                  (bracket == 'losers' and player.status == 'Losers Bracket') or
+                                  (active_players|length == 2) %}
                             <option value="{{ player.player }}">{{ player.player }}</option>
                             {% endif %}
                         {% else %}
@@ -106,7 +108,6 @@
         </form>
     </div>
 
-    {% if tournament.is_elimination_format %}
     <div class="bye-form">
         <h2>Register Bye</h2>
         <form action="{{ url_for('register_bye_route', tournament_id=tournament.tournament_id) }}" method="POST">
@@ -126,8 +127,8 @@
                     <option value="">Select Player</option>
                     {% for player in active_players|sort(attribute='player') %}
                         {% if tournament.is_elimination_format %}
-                            {% if (bracket == 'winners' and (player.status is none or player.status == 'winners_bracket')) or
-                                  (bracket == 'losers' and player.status == 'losers_bracket') %}
+                            {% if (bracket == 'winners' and (player.status is none or player.status == 'Winners Bracket')) or
+                                  (bracket == 'losers' and player.status == 'Losers Bracket') %}
                             <option value="{{ player.player }}">{{ player.player }}</option>
                             {% endif %}
                         {% else %}
@@ -140,7 +141,6 @@
             <button type="submit">Register Bye</button>
         </form>
     </div>
-    {% endif %}
     {% endif %}
 
     <div class="actions">
@@ -167,8 +167,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             players.forEach(player => {
                 if ('{{ tournament.is_elimination_format }}' === 'True') {
-                    if ((selectedBracket === 'winners' && (player.status === null || player.status === '' || player.status === 'winners_bracket')) ||
-                        (selectedBracket === 'losers' && player.status === 'losers_bracket')) {
+                    if ((selectedBracket === 'winners' && (player.status === null || player.status === '' || player.status === 'Winners Bracket')) ||
+                        (selectedBracket === 'losers' && player.status === 'Losers Bracket') ||
+                        ({{ active_players|length }} === 2)) {
                         const option = document.createElement('option');
                         option.value = player.player;
                         option.textContent = player.player;
@@ -208,8 +209,8 @@ document.addEventListener('DOMContentLoaded', function() {
             byePlayerSelect.innerHTML = '<option value="">Select Player</option>';
             
             players.forEach(player => {
-                if ((selectedBracket === 'winners' && (player.status === null || player.status === '' || player.status === 'winners_bracket')) ||
-                    (selectedBracket === 'losers' && player.status === 'losers_bracket')) {
+                if ((selectedBracket === 'winners' && (player.status === null || player.status === '' || player.status === 'Winners Bracket')) ||
+                    (selectedBracket === 'losers' && player.status === 'Losers Bracket')) {
                     const option = document.createElement('option');
                     option.value = player.player;
                     option.textContent = player.player;

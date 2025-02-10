@@ -13,26 +13,34 @@ db = SQLAlchemy(app)
 app.app_context().push()
 
 class TournamentFormat(Enum):
-    SINGLE_ELIMINATION = 'single_elimination'
-    DOUBLE_ELIMINATION = 'double_elimination'
-    ROUND_ROBIN = 'round_robin'
-    SWISS = 'swiss'
+    SINGLE_ELIMINATION = 'Single Elimination'
+    DOUBLE_ELIMINATION = 'Double Elimination'
+    ROUND_ROBIN = 'Round Robin'
+    SWISS = 'Swiss'
+
+class TournamentStatus(Enum):
+    PENDING = 'Pending'
+    ACTIVE = 'Active'
+    COMPLETED = 'Completed'
+    CANCELED = 'Canceled'
 
 class PlayerStatus(Enum):
-    WINNERS_BRACKET = 'winners_bracket'
-    LOSERS_BRACKET = 'losers_bracket'
-    ELIMINATED = 'eliminated'
+    WINNERS_BRACKET = 'Winners Bracket'
+    LOSERS_BRACKET = 'Losers Bracket'
+    ACTIVE = 'Active'
+    ELIMINATED = 'Eliminated'
+    WITHDRAWN = 'Withdrawn'
+    WON = 'Won'
+    LOST = 'Lost'
 
 class Tournament(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tournament_id = db.Column(db.Integer, nullable=False, unique=True)
     name = db.Column(db.String(100), nullable=False)
     tFormat = db.Column(db.String(80), nullable=False)
-    status = db.Column(db.String(20), nullable=False, default='PENDING')  # PENDING, ACTIVE, COMPLETED, CANCELED
+    status = db.Column(db.String(20), nullable=False, default=TournamentStatus.PENDING.value)  # Use TournamentStatus
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=True)
-    current_winners_round = db.Column(db.Integer, default=1)
-    current_losers_round = db.Column(db.Integer, default=0)  # 0 means no losers bracket yet
     current_round = db.Column(db.Integer, default=1)  # For non-bracket formats
     contestants = db.relationship('Contestant', backref='tournament', lazy=True)
     matches = db.relationship('MatchResult', backref='tournament', lazy=True)
@@ -45,16 +53,14 @@ class Tournament(db.Model):
     def is_double_elimination(self):
         return self.tFormat == TournamentFormat.DOUBLE_ELIMINATION.value
 
-    @property
-    def total_rounds_needed(self):
-        """Calculate total rounds needed based on format and player count"""
-        player_count = len([c for c in self.contestants if c.active])
-        if self.tFormat == TournamentFormat.ROUND_ROBIN.value:
-            return player_count - 1
-        elif self.tFormat == TournamentFormat.SWISS.value:
-            # Swiss typically uses log2(N) rounds, rounded up
-            return math.ceil(math.log2(player_count))
-        return None  # For elimination formats
+    def get_round(self):
+        """Determine the current round based on the round count."""
+        return self.current_round
+
+    def increment_round(self):
+        """Increment the round count."""
+        self.current_round += 1
+        db.session.commit()
 
     def get_swiss_pairings(self):
         """Generate Swiss-system Monrad pairings for the current round"""
@@ -127,6 +133,16 @@ class Tournament(db.Model):
         
         return pairings
 
+    def total_rounds_needed(self):
+        """Calculate total rounds needed based on format and player count"""
+        player_count = len([c for c in self.contestants if c.active])
+        if self.tFormat == TournamentFormat.ROUND_ROBIN.value:
+            return player_count - 1
+        elif self.tFormat == TournamentFormat.SWISS.value:
+            # Swiss typically uses log2(N) rounds, rounded up
+            return math.ceil(math.log2(player_count))
+        return None  # For elimination formats
+
 class Contestant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player = db.Column(db.String(80), nullable=False)
@@ -169,22 +185,21 @@ class Contestant(db.Model):
             self.score += 1
         else:
             self.losses += 1
-            if tournament.is_elimination_format:
-                self.handle_loss()
-
-    def handle_loss(self):
-        """Handle the logic when a contestant loses a match."""
-        tournament = Tournament.query.filter_by(tournament_id=self.tournament_id).first()
-        if tournament.is_elimination_format:
-            self.status = PlayerStatus.ELIMINATED.value
-            self.active = False
+            if tournament.is_double_elimination:
+                if self.losses == 1:
+                    self.status = PlayerStatus.LOSERS_BRACKET.value
+                else:
+                    self.status = PlayerStatus.ELIMINATED.value
+                    self.active = False
+            else:
+                self.status = PlayerStatus.ELIMINATED.value
+                self.active = False
         db.session.commit()
 
 class MatchResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournament.tournament_id'), nullable=False)
     round_number = db.Column(db.Integer, nullable=False)
-    bracket = db.Column(db.String(20), nullable=True)  # Nullable for non-bracket formats
     player1_id = db.Column(db.Integer, db.ForeignKey('contestant.id'), nullable=False)
     player2_id = db.Column(db.Integer, db.ForeignKey('contestant.id'), nullable=True)  # Nullable for byes
     player1 = db.Column(db.String(80), nullable=False)
@@ -232,7 +247,6 @@ def register_bye(tournament_id, player_name):
         match = MatchResult(
             tournament_id=tournament_id,
             round_number=tournament.current_round,
-            bracket='winners',
             player1_id=player.id,
             player1=player_name,
             status='BYE',
@@ -254,7 +268,7 @@ def register_bye(tournament_id, player_name):
         # Check active players
         active_players = [c for c in tournament.contestants if c.active]
         if len(active_players) == 1:
-            tournament.status = 'COMPLETED'
+            tournament.status = TournamentStatus.COMPLETED.value
             db.session.commit()
         
         # Check if round is complete
@@ -269,9 +283,9 @@ def check_round_completion(tournament_id):
     """Check if all players in the current round have matches and increment round if needed."""
     tournament = Tournament.query.filter_by(tournament_id=tournament_id).first_or_404()
     active_players = Contestant.query.filter_by(tournament_id=tournament_id, active=True).all()
+    current_round = tournament.current_round
     
     # Get all matches for the current round
-    current_round = tournament.current_winners_round if tournament.is_elimination_format else tournament.current_round
     current_round_matches = MatchResult.query.filter_by(
         tournament_id=tournament_id,
         round_number=current_round
@@ -285,29 +299,35 @@ def check_round_completion(tournament_id):
             players_with_matches.add(match.player2)
     
     # Check if all active players have matches
-    active_player_names = {player.player for player in active_players}
-    if players_with_matches == active_player_names:
-        # All players have matches, check if we should increment round
-        if tournament.is_elimination_format:
-            tournament.current_winners_round += 1
+    if tournament.is_double_elimination:
+        if current_round % 2 == 1:
+            # Winners bracket round
+            # Check if all players in winners bracket have played
+            winners_players = Contestant.query.filter_by(tournament_id=tournament_id, status=PlayerStatus.WINNERS_BRACKET.value).all()
+            if all(p.player in players_with_matches for p in winners_players):
+                tournament.increment_round()
         else:
-            # For Round Robin and Swiss, check if we've reached the total rounds
-            if tournament.total_rounds_needed and tournament.current_round >= tournament.total_rounds_needed:
-                tournament.status = 'COMPLETED'
-            else:
-                tournament.current_round += 1
-        
-        db.session.commit()
-        return True
+            # Losers bracket round
+            # Check if all players in losers bracket have played
+            losers_players = Contestant.query.filter_by(tournament_id=tournament_id, status=PlayerStatus.LOSERS_BRACKET.value).all()
+            if all(p.player in players_with_matches for p in losers_players):
+                tournament.increment_round()
+    else:
+        if active_players.count == len(players_with_matches): 
+            tournament.increment_round()
     
-    return False
+    if tournament.status == TournamentStatus.COMPLETED.value:
+        tournament.current_round -= 1
+    
+    # Update tournament
+    db.session.commit()
 
 @app.route('/')
 def index():
     """Home page."""
     # Get active tournaments
     active_tournaments = Tournament.query.filter(
-        Tournament.status.in_(['PENDING', 'ACTIVE'])
+        Tournament.status.in_([TournamentStatus.PENDING.value, TournamentStatus.ACTIVE.value])
     ).order_by(Tournament.start_date.desc()).all()
     
     # Get recent players (players who have participated in the last 5 tournaments)
@@ -358,11 +378,11 @@ def create():
 
         # Determine status based on dates
         if current_time < start_date:
-            status = 'PENDING'
+            status = TournamentStatus.PENDING.value
         elif current_time <= end_date:
-            status = 'ACTIVE'
+            status = TournamentStatus.ACTIVE.value
         else:
-            status = 'COMPLETED'
+            status = TournamentStatus.COMPLETED.value
 
         tournament = Tournament(
             tournament_id=tournament_id,
@@ -388,18 +408,18 @@ def tournaments():
     
     # Update tournament statuses based on current time
     for tournament in tournaments:
-        if tournament.status != 'COMPLETED' and tournament.status != 'CANCELED':
+        if tournament.status != TournamentStatus.COMPLETED.value and tournament.status != TournamentStatus.CANCELED.value:
             if current_time < tournament.start_date:
-                new_status = 'PENDING'
+                new_status = TournamentStatus.PENDING.value
             elif current_time <= tournament.end_date:
-                new_status = 'ACTIVE'
+                new_status = TournamentStatus.ACTIVE.value
             else:
-                new_status = 'COMPLETED'
+                new_status = TournamentStatus.COMPLETED.value
                 
             if new_status != tournament.status:
                 tournament.status = new_status
     
-    tournaments = sorted(tournaments, key=lambda x: (int(x.status != 'ACTIVE'), int(x.status != 'PENDING'), int(x.status != 'COMPLETED'), -int(round(x.start_date.timestamp()))))
+    tournaments = sorted(tournaments, key=lambda x: (int(x.status != TournamentStatus.ACTIVE.value), int(x.status != TournamentStatus.PENDING.value), int(x.status != TournamentStatus.COMPLETED.value), -int(round(x.start_date.timestamp()))))
     
     db.session.commit()
     return render_template('tournaments.html', tournaments=tournaments)
@@ -471,7 +491,7 @@ def match_management(tournament_id):
         'match_management.html',
         tournament=tournament,
         active_players=active_players,  # For template rendering
-        players=serializable_players,   # For JavaScript
+        players=serializable_players,
         bracket='winners'  # Default to winners bracket
     )
 
@@ -501,7 +521,12 @@ def add_player(tournament_id):
             seed=request.form.get('seed'),
             tournament_id=tournament_id
         )
-        
+
+        if tournament.is_double_elimination:
+            player.status = PlayerStatus.WINNERS_BRACKET.value
+        else:
+            player.status = PlayerStatus.ACTIVE.value
+
         db.session.add(player)
         db.session.commit()
         
@@ -522,6 +547,7 @@ def remove_player(tournament_id):
         
         # Set player as inactive instead of deleting
         player.active = False
+        player.status = PlayerStatus.WITHDRAWN.value
         
         # Get the tournament by ID
         tournament = Tournament.query.filter_by(tournament_id=tournament_id).first()
@@ -529,7 +555,7 @@ def remove_player(tournament_id):
         # Check active players
         active_players = [c for c in tournament.contestants if c.active]
         if len(active_players) == 1:
-            tournament.status = 'COMPLETED'
+            tournament.status = TournamentStatus.COMPLETED.value
         
         db.session.commit()
         
@@ -548,7 +574,7 @@ def submit_result(tournament_id):
             raise ValueError("Players must be different")
         
         # Check if either player already has a match in this round
-        current_round = tournament.current_winners_round if tournament.is_elimination_format else tournament.current_round
+        current_round = tournament.current_round
         for player in [data['player1'], data['player2']]:
             existing_match = MatchResult.query.filter(
                 MatchResult.tournament_id == tournament_id,
@@ -589,7 +615,6 @@ def submit_result(tournament_id):
         match = MatchResult(
             tournament_id=tournament_id,
             round_number=current_round,
-            bracket='winners' if tournament.is_elimination_format else None,
             player1_id=player1.id,
             player2_id=player2.id,
             player1=player1.player,  # Use string value instead of Contestant object
@@ -619,14 +644,24 @@ def submit_result(tournament_id):
         db.session.add(match)
         db.session.commit()
         
-        # Get the tournament by ID
-        tournament = Tournament.query.filter_by(tournament_id=tournament_id).first()
-        
-        # Check active players
-        active_players = [c for c in tournament.contestants if c.active]
-        if len(active_players) == 1:
-            tournament.status = 'COMPLETED'
-            db.session.commit()
+        # Check for tournament end conditions
+        if tournament.is_elimination_format:
+            active_players = Contestant.query.filter_by(tournament_id=tournament_id, active=True).all()
+            if len(active_players) == 1:
+                # Set the remaining player's status to 'Won'
+                active_players[0].status = PlayerStatus.WON.value
+                tournament.status = TournamentStatus.COMPLETED.value
+                db.session.commit()
+        else:
+            if tournament.current_round > tournament.total_rounds_needed:
+                # Set the highest scorer's status to 'Won' and others to 'Lost'
+                highest_scorer = max(tournament.contestants, key=lambda p: p.score)
+                highest_scorer.status = PlayerStatus.WON.value
+                for player in tournament.contestants:
+                    if player != highest_scorer:
+                        player.status = PlayerStatus.LOST.value
+                tournament.status = TournamentStatus.COMPLETED.value
+                db.session.commit()
         
         # Check if round is complete and increment if needed
         check_round_completion(tournament_id)
@@ -653,7 +688,7 @@ def player_stats(player_name):
         total_matches += contestant.matches_played
         total_wins += contestant.matches_won
         # Check if player won the tournament (highest score in completed tournament)
-        if tournament.status == 'COMPLETED':
+        if tournament.status == TournamentStatus.COMPLETED.value:
             max_score = max(c.score for c in tournament.contestants)
             if contestant.score == max_score:
                 tournaments_won += 1
@@ -697,15 +732,15 @@ def update_tournament(tournament_id):
         if data.get('current_round'):
             tournament.current_round = int(data['current_round'])
             
-        if tournament.status != 'COMPLETED' and tournament.status != 'CANCELED':
+        if tournament.status != TournamentStatus.COMPLETED.value and tournament.status != TournamentStatus.CANCELED.value:
             # Update status based on new dates
             current_time = datetime.now()
             if current_time < tournament.start_date:
-                tournament.status = 'PENDING'
+                tournament.status = TournamentStatus.PENDING.value
             elif current_time <= tournament.end_date:
-                tournament.status = 'ACTIVE'
+                tournament.status = TournamentStatus.ACTIVE.value
             else:
-                tournament.status = 'COMPLETED'
+                tournament.status = TournamentStatus.COMPLETED.value
             
         db.session.commit()
         return redirect(url_for('tournament_details', tournament_id=tournament_id))
@@ -727,12 +762,12 @@ def cancel_tournament(tournament_id):
     
     # Check for confirmation
     confirmation = request.form.get('confirmation')
-    if confirmation == 'Yes':
+    if confirmation and confirmation.lower() == 'yes':
         # Remove all matches and byes associated with the tournament
         MatchResult.query.filter_by(tournament_id=tournament_id).delete()
         
         # Set tournament status to CANCELED
-        tournament.status = 'CANCELED'
+        tournament.status = TournamentStatus.CANCELED.value
         db.session.commit()
         flash('Tournament has been canceled successfully.')
     else:
