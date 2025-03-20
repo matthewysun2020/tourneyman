@@ -17,22 +17,22 @@
             <p><strong>Current Round:</strong>
                 {% if tournament.is_double_elimination %}
                     {% if tournament.current_round % 2 == 1 %}
-                        {% if tournament.active_players|length == 2 %}
+                        {% if tournament.active_players|length <= 2 %}
                             Grand Finals
                         {% else %}
                             Winners Round {{ (tournament.current_round + 1) // 2 }}
                         {% endif %}
                     {% else %}
-                        {% if tournament.active_players|length == 2 %}
+                        {% if tournament.active_players|length <= 2 %}
                             Grand Finals Reset
                         {% else %}
                             Losers Round {{ tournament.current_round // 2 }}
                         {% endif %}
                     {% endif %}
                 {% elif tournament.is_elimination_format %}
-                    {% if tournament.current_round == 1 and tournament.active_players|length == 4 %}
+                    {% if tournament.active_players|length == 4 %}
                         Semi-Finals
-                    {% elif tournament.current_round == 1 and tournament.active_players|length == 2 %}
+                    {% elif tournament.active_players|length == 2 %}
                         Finals
                     {% else %}
                         {{ tournament.current_round }}
