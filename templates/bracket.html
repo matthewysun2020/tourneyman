@@ -21,13 +21,13 @@
                     {% if match.round_number == round %}
                         <div class="match">
                             <div class="player">
-                                <span class="{% if match.winner == match.player1 %}winner{% endif %}">{{ match.player1 }}</span>
-                                <span class="score">{{ match.score.split('-')[0] }}</span>
+                                <span class="{% if match.winner == match.player1 %}winner{% else %}elim{% endif %}">{{ match.player1 }}</span>
+                                <span class="{% if match.winner == match.player1 %}winner-score{% else %}elim-score{% endif %}">{{ match.score.split('-')[0] }}</span>
                             </div>
                             <span class="divider"></span>
                             <div class="player">
-                                <span class="{% if match.winner == match.player2 %}winner{% endif %}">{{ match.player2 if match.player2 else 'BYE' }}</span>
-                                <span class="score">{{ match.score.split('-')[1] if match.player2 else '-' }}</span>
+                                <span class="{% if match.winner == match.player2 %}winner{% else %}elim{% endif %}">{{ match.player2 if match.player2 else 'BYE' }}</span>
+                                <span class="{% if match.winner == match.player2 %}winner-score{% else %}elim-score{% endif %}">{{ match.score.split('-')[1] if match.player2 else '-' }}</span>
                             </div>
                         </div>
                     {% endif %}
