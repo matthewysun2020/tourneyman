@@ -356,6 +356,8 @@ h3 {
     flex-direction: column;
     justify-content: top center;
     padding: 10px;
+    width: 200px; /* Set a fixed width for each round column */
+    margin-right: 20px; /* Gap between columns */
 }
 
 .match {
@@ -363,14 +365,47 @@ h3 {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px; /* Space between matches */
     gap: 10px;
+    border: 2px solid #bbb; /* Outline for better visual clarity */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px; /* Padding inside the match container */
 }
 
-.connector {
-    width: 50px;
+.player {
+    display: flex;
+    justify-content: space-between; /* Align player name and score */
+    width: 100%; /* Take full width of the match container */
+}
+
+.winner-score {
+    margin-left: 10px; /* Space between name and score */
+    font-weight: bold;
+    color: darkgreen; /* Change the color to dark green */
+    text-align: right; /* Right justify the score */
+}
+
+.winner {
+    font-weight: bold; /* Bold the winner's name */
+    color: darkgreen; /* Change the color to dark green */
+}
+
+.elim {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.elim-score {
+    margin-left: 10px; /* Space between name and score */
+    text-decoration: line-through;
+    color: #888;
+    text-align: right; /* Right justify the score */
+}
+
+.divider {
+    width: 200px;
     height: 2px; /* Adjust height as needed */
-    background: black;
+    background: #bbb;
     margin: 0 10px; /* Space between players and connector */
 }
 

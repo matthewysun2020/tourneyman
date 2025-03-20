@@ -10,13 +10,25 @@
         <div class="bracket">
         {% for round in range(1, max_round_number + 1) %}
             <div class="round">
+                {% if round == max_round_number %}
+                <h2>Finals</h2>
+                {% elif round == max_round_number - 1 %}
+                <h2>Semi-Finals</h2>
+                {% else %}
                 <h2>Round {{ round }}</h2>
+                {% endif %}
                 {% for match in matches %}
                     {% if match.round_number == round %}
                         <div class="match">
-                            <span>{{ match.player1 }}</span>
-                            <span class="connector"></span>
-                            <span>{{ match.player2 if match.player2 else 'BYE' }}</span>
+                            <div class="player">
+                                <span class="{% if match.winner == match.player1 %}winner{% endif %}">{{ match.player1 }}</span>
+                                <span class="score">{{ match.score.split('-')[0] }}</span>
+                            </div>
+                            <span class="divider"></span>
+                            <div class="player">
+                                <span class="{% if match.winner == match.player2 %}winner{% endif %}">{{ match.player2 if match.player2 else 'BYE' }}</span>
+                                <span class="score">{{ match.score.split('-')[1] if match.player2 else '-' }}</span>
+                            </div>
                         </div>
                     {% endif %}
                 {% endfor %}
@@ -29,13 +41,25 @@
         <div class="bracket">
             {% for round in range(1, max_round_number + 1, 2) %}
                 <div class="round">
+                    {% if round >= max_round_number - 1 and tournament.status.lower() == 'completed' %}
+                    <h2>Grand Finals</h2>
+                    {% elif round >= max_round_number - 3 and tournament.status.lower() == 'completed' %}
+                    <h2>Winners Finals</h2>
+                    {% else %}
                     <h2>Winners Round {{ round // 2 + 1 }}</h2>
+                    {% endif %}
                     {% for match in matches %}
                         {% if match.round_number == round %}
                             <div class="match">
-                                <span>{{ match.player1 }}</span>
-                                <span class="connector"></span>
-                                <span>{{ match.player2 if match.player2 else 'BYE' }}</span>
+                                <div class="player">
+                                    <span class="{% if match.winner == match.player1 %}winner{% endif %}">{{ match.player1 }}</span>
+                                    <span class="{% if match.winner == match.player1 %}winner-score{% endif %}">{{ match.score.split('-')[0] }}</span>
+                                </div>
+                                <span class="divider"></span>
+                                <div class="player">
+                                    <span class="{% if match.winner == match.player2 %}winner{% endif %}">{{ match.player2 if match.player2 else 'BYE' }}</span>
+                                    <span class="{% if match.winner == match.player2 %}winner-score{% endif %}">{{ match.score.split('-')[1] if match.player2 else '-' }}</span>
+                                </div>
                             </div>
                         {% endif %}
                     {% endfor %}
@@ -43,15 +67,27 @@
             {% endfor %}
         </div>
         <div class="bracket">
-            {% for round in range(2, max_round_number, 2) %}
+            {% for round in range(2, max_round_number + 1, 2) %}
                 <div class="round">
-                    <h2>Losers Round {{ round // 2}}</h2>
+                    {% if round == max_round_number and tournament.status.lower() == 'completed' %}
+                    <h2>Grand Finals Reset</h2>
+                    {% elif round >= max_round_number - 2 and tournament.status.lower() == 'completed' %}
+                    <h2>Losers Finals</h2>
+                    {% else %}
+                    <h2>Losers Round {{ round // 2 }}</h2>
+                    {% endif %}
                     {% for match in matches %}
                         {% if match.round_number == round %}
                             <div class="match">
-                                <span>{{ match.player1 }}</span>
-                                <span class="connector"></span>
-                                <span>{{ match.player2 if match.player2 else 'BYE' }}</span>
+                                <div class="player">
+                                    <span class="{% if match.winner == match.player1 %}winner{% else %}elim{% endif %}">{{ match.player1 }}</span>
+                                    <span class="{% if match.winner == match.player1 %}winner-score{% else %}elim-score{% endif %}">{{ match.score.split('-')[0] }}</span>
+                                </div>
+                                <span class="divider"></span>
+                                <div class="player">
+                                    <span class="{% if match.winner == match.player2 %}winner{% else %}elim{% endif %}">{{ match.player2 if match.player2 else 'BYE' }}</span>
+                                    <span class="{% if match.winner == match.player2 %}winner-score{% else %}elim-score{% endif %}">{{ match.score.split('-')[1] if match.player2 else '-' }}</span>
+                                </div>
                             </div>
                         {% endif %}
                     {% endfor %}
