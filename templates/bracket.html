@@ -4,13 +4,82 @@
 
 {% block content %}
 <div class="container">
-    <h1>Tournament Bracket - {{ tournament.name }}</h1>
-    <div class="bracket-section">
-        <div id="bracket">
-            <!-- Bracket will be rendered here -->
-            <p>Bracket view coming soon...</p>
+    <h1>{{ tournament.name }} Bracket</h1>
+    {% if tournament.is_single_elimination %}
+    <div class="bracket-container">
+        <div class="bracket">
+        {% for round in range(1, max_round_number + 1) %}
+            <div class="round">
+                <h2>Round {{ round }}</h2>
+                {% for match in matches %}
+                    {% if match.round_number == round %}
+                        <div class="match">
+                            <span>{{ match.player1 }}</span>
+                            <span class="connector"></span>
+                            <span>{{ match.player2 if match.player2 else 'BYE' }}</span>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
         </div>
     </div>
+    {% elif tournament.is_double_elimination%}
+    <div class="bracket-container">
+        <div class="bracket">
+            {% for round in range(1, max_round_number + 1, 2) %}
+                <div class="round">
+                    <h2>Winners Round {{ round // 2 + 1 }}</h2>
+                    {% for match in matches %}
+                        {% if match.round_number == round %}
+                            <div class="match">
+                                <span>{{ match.player1 }}</span>
+                                <span class="connector"></span>
+                                <span>{{ match.player2 if match.player2 else 'BYE' }}</span>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="bracket">
+            {% for round in range(2, max_round_number, 2) %}
+                <div class="round">
+                    <h2>Losers Round {{ round // 2}}</h2>
+                    {% for match in matches %}
+                        {% if match.round_number == round %}
+                            <div class="match">
+                                <span>{{ match.player1 }}</span>
+                                <span class="connector"></span>
+                                <span>{{ match.player2 if match.player2 else 'BYE' }}</span>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="scoreboard">
+        <h2>Scoreboard</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player, score in player_scores.items() %}
+                    <tr>
+                        <td>{{ player }}</td>
+                        <td>{{ score }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
     <div class="navigation">
         <a href="{{ url_for('tournament_details', tournament_id=tournament.tournament_id) }}" class="link">Back to Tournament</a>
         <a href="{{ url_for('index') }}" class="link">Back to Home</a>

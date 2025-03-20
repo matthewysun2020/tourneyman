@@ -152,7 +152,7 @@ h3 {
 }
 
 /* Lists */
-.players-list, .match-list {
+.players-list, .match-list, .scoreboard {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
@@ -334,12 +334,44 @@ h3 {
 }
 
 /* Bracket Section */
-.bracket-section {
-    margin: 30px 0;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    min-height: 400px;
+.bracket-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent wrapping of matches */
+    gap: 10px;
+}
+
+.bracket {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent wrapping of matches */
+}
+
+.round {
+    display: flex;
+    flex-direction: column;
+    justify-content: top center;
+    padding: 10px;
+}
+
+.match {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.connector {
+    width: 50px;
+    height: 2px; /* Adjust height as needed */
+    background: black;
+    margin: 0 10px; /* Space between players and connector */
 }
 
 .welcome-text {

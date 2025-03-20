@@ -506,11 +506,6 @@ def update_tournament_page(tournament_id):
     tournament = Tournament.query.filter_by(tournament_id=tournament_id).first_or_404()
     return render_template('update_tournament.html', tournament=tournament)
 
-@app.route('/tournaments/<int:tournament_id>/bracket')
-def bracket(tournament_id):
-    tournament = Tournament.query.filter_by(tournament_id=tournament_id).first_or_404()
-    return render_template('bracket.html', tournament=tournament)
-
 @app.route('/tournaments/<int:tournament_id>/add_player', methods=['POST'])
 def add_player(tournament_id):
     try:
@@ -775,6 +770,22 @@ def cancel_tournament(tournament_id):
     
     return redirect(url_for('tournament_details', tournament_id=tournament_id))
 
+@app.route('/tournaments/<int:tournament_id>/bracket')
+def bracket(tournament_id):
+    tournament = Tournament.query.filter_by(tournament_id=tournament_id).first_or_404()
+    matches = MatchResult.query.filter_by(tournament_id=tournament_id).order_by(MatchResult.round_number).all()
+    
+    # Query to get the maximum round number
+    max_round_number = db.session.query(db.func.max(MatchResult.round_number)).filter_by(tournament_id=tournament_id).scalar()
+    
+    # Query for player scores if the tournament is not elimination format
+    if not tournament.is_elimination_format:
+        players = Contestant.query.filter_by(tournament_id=tournament_id).all()
+        player_scores = {player.player: player.score for player in players}
+    else:
+        player_scores = None  # No scores needed for elimination format
+    
+    return render_template('bracket.html', tournament=tournament, matches=matches, player_scores=player_scores, max_round_number=max_round_number)
 @app.cli.command('reset_db')
 def reset_db():
     """Reset the database."""
